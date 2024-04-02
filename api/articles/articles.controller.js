@@ -1,4 +1,4 @@
-const { createArticle, updateArticle, deleteArticle } = require('./articles.service');
+const { createArticle, updateArticle, deleteArticle } = require("./articles.service");
 
 // Crée un nouvel article
 const create = async (req, res) => {
@@ -24,7 +24,6 @@ const update = async (req, res) => {
     if (!article) {
       res.status(404).json({ message: 'Article not found' });
     } else {
-      //notifier les clients en temps réel de la mise à jour de l'article
       req.io.emit('articleUpdated', { id, article });
 
       res.json(article);
@@ -49,8 +48,4 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = {
-  create,
-  update,
-  remove
-};
+module.exports = { create, update, remove };

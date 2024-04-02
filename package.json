@@ -16,9 +16,10 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
-    "express": "^4.18.1",
+    "express": "^4.19.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.4.5",
+    "mongoose": "^6.12.7",
+    "routes": "^2.1.0",
     "socket.io": "^4.5.1",
     "validator": "^13.7.0"
   },
@@ -37,6 +38,8 @@
     }
   },
   "babel": {
-    "presets": ["@babel/preset-env"]
+    "presets": [
+      "@babel/preset-env"
+    ]
   }
 }
