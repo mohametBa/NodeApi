@@ -1,5 +1,6 @@
+
 const isAuthenticated = (req, res, next) => {
-  const userIsAuthenticated = true; 
+  const userIsAuthenticated = req.user != null;
   if (userIsAuthenticated) {
     next();
   } else {
@@ -8,7 +9,7 @@ const isAuthenticated = (req, res, next) => {
 };
 
 const authoAdmin = (req, res, next) => {
-  const userIsAdmin = true; 
+  const userIsAdmin = req.user && req.user.isAdmin;
   if (userIsAdmin) {
     next();
   } else {

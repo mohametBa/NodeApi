@@ -1,57 +1,30 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const Article = require('./articles.schema');
 
-// le schema pour la methode populate
-const personSchema = Schema({
-    _id: Schema.Types.ObjectId,
-    name: String,
-    age: Number,
-    stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
-  });
-  
-  const storySchema = Schema({
-    author: { type: Schema.Types.ObjectId, ref: 'Person' },
-    title: String,
-  });
-  
-  // Modèles populate()
-  const Story = mongoose.model('Story', storySchema);
-  
-  const getStoriesWithDetails = async () => {
-    const stories = await Story.find()
-      .populate('author', 'name -_id') // on enléve son id
-      .exec();
-  
-    return stories;
-  };
-  
-  getStoriesWithDetails().then(stories => {
-    console.log(stories);
-  }).catch(err => {
-    console.error(err);
-  });
-
-const Article = require('./articles.schema'); 
-
+// creation d'un article
 const createArticle = async (articleData, userId) => {
   const article = new Article({ ...articleData, user: userId });
   return await article.save();
 };
 
+// mise a jour d'un article
 const updateArticle = async (articleId, articleData, userId) => {
-  const article = await Article.findOne({ _id: articleId, user: userId });
+  const article = await Article.findByIdAndUpdate(
+    { _id: articleId, user: userId },
+    articleData,
+    { new: true }  // Retourne le document
+  );
   if (!article) {
-    throw new Error('Article introuvable');
+    throw new Error('Article introuvable ou accès non autorisé');
   }
-
-  Object.assign(article, articleData);
-  return await article.save();
+  return article;
 };
 
+// supprimer un article
 const deleteArticle = async (articleId, userId) => {
   const result = await Article.deleteOne({ _id: articleId, user: userId });
   if (result.deletedCount === 0) {
-    throw new Error('Article introuvable');
+    throw new Error('Article introuvable ou accès non autorisé');
   }
   return result;
 };

@@ -1,29 +1,34 @@
 const UnauthorizedError = require("../errors/unauthorized");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
-const User = require("../api/users/users.model"); 
+const User = require("../api/users/users.model");
 
 module.exports = async (req, res, next) => {
   try {
     const token = req.headers["x-access-token"];
     if (!token) {
-      throw "No token provided.";
-    }
-    const decoded = jwt.verify(token, config.secretJwtToken);
-
-    if (!decoded || !decoded.id) {
-      throw "Invalid token.";
+      throw new UnauthorizedError("No token provided.");
     }
 
-    const user = await User.findById(decoded.id).select('-password');
+    let decoded;
+    try {
+      decoded = jwt.verify(token, config.secretJwtToken);
+    } catch (jwtError) {
+      throw new UnauthorizedError("Invalid token.");
+    }
+
+    if (!decoded || !decoded.userId) {  // id à userId
+      throw new UnauthorizedError("Invalid token.");
+    }
+
+    const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
-      throw "User not found.";
+      throw new UnauthorizedError("User not found.");
     }
 
     req.user = user;
     next();
   } catch (error) {
-    const message = typeof error === 'string' ? error : (error.message || "Unauthorized.");
-    next(new UnauthorizedError(message));
+    next(error instanceof UnauthorizedError ? error : new UnauthorizedError(error.message || "Unauthorized."));
   }
 };

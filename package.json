@@ -14,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "babel-jest": "^29.7.0",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^8.5.1",
@@ -24,6 +25,8 @@
     "validator": "^13.7.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.4",
+    "@babel/preset-env": "^7.24.4",
     "chai": "^5.1.0",
     "chai-http": "^4.4.0",
     "jest": "^28.1.3",

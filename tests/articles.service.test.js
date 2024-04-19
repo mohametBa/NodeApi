@@ -1,12 +1,12 @@
-const mockingoose = require('mockingoose').default;
-const { createArticle } = require('../src/api/articles/articles.service');
+const mockingoose = require('mockingoose');
+const { createArticle } = require('../api/articles/articles.service');
 const Article = require('../api/articles/articles.service');
 
 describe('createArticle', () => {
   beforeEach(() => {
     mockingoose.resetAll(); 
   });
-
+  
   it('successfully creates an article', async () => {
     const mockArticleData = { title: 'Test Article', content: 'Test content' };
     const mockArticle = { _id: '507f1f77bcf86cd799439011', ...mockArticleData };

@@ -1,51 +1,48 @@
-const { createArticle, updateArticle, deleteArticle } = require("./articles.service");
+const ArticleService = require('./articles.service');
 
-// Crée un nouvel article
-const create = async (req, res) => {
+// Création d'un article
+exports.create = async (req, res) => {
   try {
-    const userId = req.user._id; 
-    const article = await createArticle(req.body, userId);
-
-    // notifier les clients en temps réel
+    const userId = req.user._id;
+    const article = await ArticleService.createArticle(req.body, userId);
     req.io.emit('articleCreated', article);
-
     res.status(201).json(article);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// Mettre à jour un article existant
-const update = async (req, res) => {
-  try {
-    const userId = req.user._id; 
-    const { id } = req.params;
-    const article = await updateArticle(id, req.body, userId);
-    if (!article) {
-      res.status(404).json({ message: 'Article not found' });
-    } else {
-      req.io.emit('articleUpdated', { id, article });
-
-      res.json(article);
-    }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+// Mise à jour d'un article
+exports.update = async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Unauthorized" });  // Clarification du message d'erreur
   }
-};
-
-// Pour supprimer un article
-const remove = async (req, res) => {
   try {
     const userId = req.user._id;
     const { id } = req.params;
-    await deleteArticle(id, userId);
-    
-    req.io.emit('articleDeleted', { id });
-
-    res.status(204).end(); 
+    const article = await ArticleService.updateArticle(id, req.body, userId);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+    req.io.emit('articleUpdated', { id, article });
+    res.json(article);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-module.exports = { create, update, remove };
+// Suppression d'un article
+exports.remove = async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Unauthorized" });
+  }
+  try {
+    const userId = req.user._id;
+    const { id } = req.params;
+    await ArticleService.deleteArticle(id, userId);
+    req.io.emit('articleDeleted', { id });
+    res.status(204).end();
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};

@@ -1,7 +1,7 @@
 const request = require("supertest");
 const { app } = require("../server");
 const jwt = require("jsonwebtoken");
-const config = require("../config");
+const config = require("../config/index");
 const mongoose = require("mongoose");
 const mockingoose = require("mockingoose");
 const User = require("../api/users/users.model");
@@ -26,14 +26,14 @@ describe("tester API users", () => {
 
   beforeEach(() => {
     token = jwt.sign({ userId: USER_ID }, config.secretJwtToken);
-    // mongoose.Query.prototype.find = jest.fn().mockResolvedValue(MOCK_DATA);
+    mongoose.Query.prototype.find = jest.fn().mockResolvedValue(MOCK_DATA);
     mockingoose(User).toReturn(MOCK_DATA, "find");
     mockingoose(User).toReturn(MOCK_DATA_CREATED, "save");
   });
 
   test("[Users] Get All", async () => {
     const res = await request(app)
-      .get("/api/users")
+      .get("/api/users/users.model.js")
       .set("x-access-token", token);
     expect(res.status).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
@@ -41,7 +41,7 @@ describe("tester API users", () => {
 
   test("[Users] Create User", async () => {
     const res = await request(app)
-      .post("/api/users")
+      .post("/api/users/users.model.js")
       .send(MOCK_DATA_CREATED)
       .set("x-access-token", token);
     expect(res.status).toBe(201);
@@ -52,7 +52,7 @@ describe("tester API users", () => {
     const spy = jest
       .spyOn(usersService, "getAll")
       .mockImplementation(() => "test");
-    await request(app).get("/api/users").set("x-access-token", token);
+    await request(app).get("/api/users/users.model.js").set("x-access-token", token);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveReturnedWith("test");
