@@ -1,31 +1,40 @@
-const mongoose = require('mongoose');
-const Article = require('./articles.schema');
+const Article = require('./articles.schema'); 
 
-// creation d'un article
+// Création d'un article
 const createArticle = async (articleData, userId) => {
   const article = new Article({ ...articleData, user: userId });
   return await article.save();
 };
 
-// mise a jour d'un article
-const updateArticle = async (articleId, articleData, userId) => {
-  const article = await Article.findByIdAndUpdate(
-    { _id: articleId, user: userId },
-    articleData,
-    { new: true }  // Retourne le document
-  );
-  if (!article) {
-    throw new Error('Article introuvable ou accès non autorisé');
+// maj d'un article
+const updateArticle = async (articleId, articleData, user) => {
+  if (user.role !== 'admin') {
+    throw new Error('Vous devez être administrateur pour effectuer cette action.');
   }
-  return article;
+  
+  const article = await Article.findById(articleId);
+  
+  if (!article) {
+    throw new Error('Article introuvable.');
+  }
+
+  // maj de l'article avec les données fournies et retourner le nouvel article
+  Object.assign(article, articleData);
+  return await article.save();
 };
 
 // supprimer un article
-const deleteArticle = async (articleId, userId) => {
-  const result = await Article.deleteOne({ _id: articleId, user: userId });
-  if (result.deletedCount === 0) {
-    throw new Error('Article introuvable ou accès non autorisé');
+const deleteArticle = async (articleId, user) => {
+  if (user.role !== 'admin') {
+    throw new Error('Vous devez être administrateur pour effectuer cette action.');
   }
+  
+  const result = await Article.findByIdAndDelete(articleId);
+  
+  if (!result) {
+    throw new Error('Article introuvable.');
+  }
+  
   return result;
 };
 

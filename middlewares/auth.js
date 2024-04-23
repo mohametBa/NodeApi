@@ -10,14 +10,8 @@ module.exports = async (req, res, next) => {
       throw new UnauthorizedError("No token provided.");
     }
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, config.secretJwtToken);
-    } catch (jwtError) {
-      throw new UnauthorizedError("Invalid token.");
-    }
-
-    if (!decoded || !decoded.userId) {  // id à userId
+    const decoded = jwt.verify(token, config.secretJwtToken);
+    if (!decoded || !decoded.userId) {
       throw new UnauthorizedError("Invalid token.");
     }
 

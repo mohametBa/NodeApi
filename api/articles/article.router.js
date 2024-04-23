@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const articlesController = require("./articles.controller");
-const { isAuthenticated,authoAdmin } = require("../../middlewares/authoAdmin"); 
+const { authoAdmin, isAuthenticated } = require("../../middlewares/auth");
 
-//Ici on ajoute une autorisation admin dans le route avec le fichier 
+// Middleware qui vérifie si l'utilisateur est connecté et est un admin
+const requireAdmin = [isAuthenticated, authoAdmin];
 
-router.put("/:id", isAuthenticated, authoAdmin, async(req, res) => {
-    res.send("Update route is working");
-  });
-
-router.delete("/:id", isAuthenticated, authoAdmin, articlesController.remove);
-
-router.post("/", isAuthenticated, authoAdmin, articlesController.create);
-
+router.post("/", isAuthenticated, articlesController.create); // Seuls les utilisateurs connectés peuvent créer des articles
+router.put("/:id", requireAdmin, articlesController.update); // Seuls les admins peuvent mettre à jour les articles
+router.delete("/:id", requireAdmin, articlesController.remove); // Seuls les admins peuvent supprimer les articles
 
 module.exports = router;

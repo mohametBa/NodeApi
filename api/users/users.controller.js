@@ -21,7 +21,7 @@ class UsersController {
       const id = req.params.id;
       const user = await usersService.get(id);
       if (!user) {
-        throw new NotFoundError();
+        throw new NotFoundError("Utilisateur non trouvé");
       }
       res.json(user);
     } catch (err) {
@@ -33,7 +33,7 @@ class UsersController {
     try {
       const user = await usersService.create(req.body);
       user.password = undefined;
-      req.io.emit("user:create", user); // Assurez-vous que req.io est correctement initialisé et disponible.
+      req.io.emit("user:create", user);
       res.status(201).json(user);
     } catch (err) {
       next(err);
@@ -56,7 +56,7 @@ class UsersController {
     try {
       const id = req.params.id;
       await usersService.delete(id);
-      req.io.emit("user:delete", { id }); // Assurez-vous que req.io est correctement initialisé et disponible.
+      req.io.emit("user:delete", { id });
       res.status(204).send();
     } catch (err) {
       next(err);
@@ -77,22 +77,25 @@ class UsersController {
     }
   }
 
-  // Intégré maintenant dans la classe UsersController
   async getUserArticles(req, res, next) {
     try {
-      const { userId } = req.params;
-
+      const { userId } = req.params; 
       const userExists = await User.exists({ _id: userId });
       if (!userExists) {
-        return res.status(404).json({ message: "Utilisateur non trouvé." });
+        throw new NotFoundError("Utilisateur non trouvé.");
       }
-
-      const articles = await Article.find({ user: userId }).select('-user');
-      res.json(articles);
+      const articles = await Article.find({ user: userId })
+        .populate('user', 'name email') 
+        .exec();
+      res.json(articles.map(article => {
+        const articleObject = article.toObject();
+        delete articleObject.user.password;
+        return articleObject;
+      }));
     } catch (error) {
       next(error); 
     }
   }
 }
 
-module.exports = new UsersController(); // 
+module.exports = new UsersController();

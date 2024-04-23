@@ -1,19 +1,16 @@
-
 const isAuthenticated = (req, res, next) => {
-  const userIsAuthenticated = req.user != null;
-  if (userIsAuthenticated) {
+  if (req.user) {
     next();
   } else {
-    res.status(401).json({ message: "Non autorisé" });
+    res.status(401).json({ message: "Accès non autorisé." });
   }
 };
 
 const authoAdmin = (req, res, next) => {
-  const userIsAdmin = req.user && req.user.isAdmin;
-  if (userIsAdmin) {
+  if (req.user && req.user.role === 'admin') {
     next();
   } else {
-    res.status(403).json({ message: "Accès refusé" });
+    res.status(403).json({ message: "Accès refusé. Réservé aux administrateurs." });
   }
 };
 
