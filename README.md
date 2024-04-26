@@ -4,5 +4,3 @@ Le fichier controller existait deja et il me manquait quelques dépendances auss
 sur mon vsCode j'ai eu un soucis entre '' et " "
 le dossier est sur la branche master
 
-
-Les tests qui nécessitent une authentification échouent en raison de l'absence de tokens valides ou de problèmes dans la gestion des tokens dans l'environnement de test.
