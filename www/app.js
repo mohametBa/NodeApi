@@ -1,5 +1,5 @@
 const { server } = require("../server");
-const config = require("../config");
+const config = require("../config/index");
 const mongoose = require("mongoose");
 
 mongoose.connect(config.mongoUri);
